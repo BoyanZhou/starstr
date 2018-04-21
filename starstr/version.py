@@ -4,4 +4,4 @@
 try:
     from starstr.version import __version__
 except ImportError:
-    __version__ = "2.0.5"
+    __version__ = "1.0"
