@@ -28,11 +28,11 @@ python setup.py install --user
 ## Input
 Input format is as follow:
 ```
-ID1\tBeijing\tHan\tstudy1\tC3c-M48\tC3\t16\t14\t18\t24\t9\t11\t13\t14\t10\t11\t19\t15\t18\t21\t10    
-ID2\tShanghai\tHan\tstudy1\tQ1a3a\tQ1a\t13\t13\t17\t24\t10\t14\t13\t13\t11\t12\t19\t15\t16\t22\t11
-ID3\tGansu\tHui\tstudy2\tR1a1a*-M17+\tR1a1\t17\t12\t17\t25\t11\t11\t13\t14\t9\t10\t20\t16\t15\t23\t13
+ID1 Beijing    Han    study1    C3c-M48     C3   16  14  18  24  9   11  13  14  10  11  19  15  18  21  10    
+ID2 Shanghai   Han    study1    Q1a3a       Q1a  13  13  17  24  10  14  13  13  11  12  19  15  16  22  11
+ID3 Gansu      Hui    study2    R1a1a*-M17+ R1a1 17  12  17  25  11  11  13  14  9   10  20  16  15  23  13
 ```
-The input file is tab-separated and each line shoud has the same number of colums.
+The input file is tab-separated and each line shoud have the same number of columns. The first 6 columns can be used to store the sample info (e.g., 1-ID, 2-Location, 3-Population, 4-study number, 5-haplogroup detail, 6-haplogroup). These 6 columns can be empty, but TAB characters that separate tham are necesssay.
 
 
 
