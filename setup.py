@@ -14,6 +14,6 @@ setup(
     scripts=['bin/starstr'],
     url='https://github.com/BoyanZhou/starstr',
     license='LICENSE.txt',
-    description='Extract descent clusters from Y-STR data',
+    description='Extract descent clades from Y-STR data',
     long_description=open('README.md').read()
 )

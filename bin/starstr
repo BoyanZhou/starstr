@@ -114,7 +114,7 @@ def main():
     grouped_result.close()
 
     # output star_cluster, first column is group number, second is number of individuals, third individual index
-    cluster_result_name = options.output_suffix + ".star_cluster_result.txt"
+    cluster_result_name = options.output_suffix + ".descent_clade_result.txt"
     cluster_result = open(cluster_result_name, "w")
     for i in set(group):
         individual_index_array = np.array(individual_index[:])

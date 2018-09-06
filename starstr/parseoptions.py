@@ -61,7 +61,6 @@ def options_parsed():
 
     # check if the Rscript executable is present on the system
     if not where_is('Rscript'):
-        print("Warning, Rscript is not in your PATH, plotting is disabled")
         options.no_r = True
 
     # get mutation rate
