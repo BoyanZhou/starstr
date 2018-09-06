@@ -47,9 +47,31 @@ Besides temporary files, this program will generate two files. One (filename for
 ```
 The first column records the group that each haplotype is assigned to. That means "ID1" belongs to group1, "ID2" and "ID3" belong to group 2.
 
-Another (filename format: prefix.descent_clade_result.txt)
+Another (filename format: prefix.descent_clade_result.txt) records indexs of individuals in each group:
+```
+1    100    1;......
+2    200    2;3;......
+...  ...    ...
+```
+It means that group1 have 100 individuals and group2 have 200 individuals.
 
 
+
+## Usage
+For usage,
+```
+starstr -h
+```
+
+Example:
+```
+starstr -i input_file.txt -o prefix -t 10 -r 0.00224,0.00293,0.00412,0.00211,0.00245,0.000519,0.00105,0.00122,0.000375,0.00545,0.00152,0.00429,0.00636,0.00433,0.00303 -s 20
+```
+-i: name of input file
+-o: prefix of output file
+-t: number of thread
+-r: mutation rates per generation of each locus separated by ","
+-s: minimum haplotypes of each group (descent clade)
 
 
 
