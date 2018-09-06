@@ -68,9 +68,13 @@ Example:
 starstr -i input_file.txt -o prefix -t 10 -r 0.00224,0.00293,0.00412,0.00211,0.00245,0.000519,0.00105,0.00122,0.000375,0.00545,0.00152,0.00429,0.00636,0.00433,0.00303 -s 20
 ```
 -i: name of input file
+
 -o: prefix of output file
+
 -t: number of thread
+
 -r: mutation rates per generation of each locus separated by ","
+
 -s: minimum haplotypes of each group (descent clade)
 
 
