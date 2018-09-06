@@ -1,5 +1,5 @@
 # starstr
-This Python program was written to extract descent clades from Y-STR data
+Extracting descent clades from Y-STR data
 
 
 
