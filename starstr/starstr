@@ -1,0 +1,136 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function
+from multiprocessing import Pool as ThreadPool
+import logging
+import time
+import sys
+import os
+import numpy as np
+import starstr
+
+""" Copyright (c) 2017  Boyan Zhou
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom
+the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+:Authors: Boyan Zhou
+:Contact: boyanzhou1992@gmail.com
+:Date: October 2017
+:Type: tool
+:Input: STR
+:Output: Grouped STR and Descent clade
+"""
+
+
+def main():
+    start_time = time.time()
+
+    options = starstr.parseoptions.options_parsed()
+    logging.basicConfig(filename=os.path.join(options.folder, "Runtime_log.txt"),
+                        format='%(asctime)s\t%(levelname)s\t%(name)s: %(message)s',
+                        level=logging.DEBUG)
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.INFO)
+    logging.getLogger().addHandler(handler)
+
+    logger = logging.getLogger("main")
+    logger.info("Started with the command: " + " ".join(sys.argv))
+
+    if not options:
+        sys.stderr.write("Option parsing failed, terminating the program\n")
+        return 1
+
+    # get number of loci
+    number_of_loci = len(options.rate)
+
+    # open STR file
+    in_str = open(options.filename, "r")
+    dataset_info = []
+    dataset_str = []
+    origin_data = []
+    for line in in_str:
+        origin_data.append(line)
+        line_checked = starstr.check_format.read_line_in_str(line, number_of_loci)
+        if line_checked:
+            dataset_info.append(line_checked[0])
+            dataset_str.append(line_checked[1])
+        else:
+            return 1
+
+    dataset_info = np.array(dataset_info)
+    dataset_str = np.array(dataset_str)
+    np.savetxt(options.filename + ".pure_data.txt", dataset_str, delimiter="\t")
+
+    print("The file was read Successfully. Pure data was produced.")
+
+    """ calculate the distance between each individual """
+    # calculate using multiprocessing
+    thread = options.thread
+    pool = ThreadPool(thread)
+    pool.map(starstr.calculate_distance.calculate, list(range(thread)))
+    pool.close()
+    pool.join()
+
+    # combine produced file
+    starstr.calculate_distance.combine_distance(options.output_suffix, thread)
+
+    """ collect D_stat for included individual and group individuals """
+    # read the combined distance file
+    distance_data = np.loadtxt(options.output_suffix + "_distance.txt")
+
+    # get index number of included individual
+    individual_index = list(set(distance_data[:, 0]))
+
+    # calculate D_stat for each individual
+    individual_d_stat = starstr.clustering.calculate_d_stat(distance_data, individual_index)
+
+    # give group number to each individual, group is a vector record the group number of individuals
+    group = starstr.clustering.grouping(distance_data, individual_index, individual_d_stat)
+
+    """ output the final results """
+    # output the origin data with group number, add the group number as the first column to the origin data
+    grouped_result = open(options.output_suffix + ".grouped_result.txt", "w")
+    for i, j in zip(individual_index, group):
+        output_line = str(int(j)) + "\t" + origin_data[int(i)]
+        grouped_result.write(output_line)
+    grouped_result.close()
+
+    # output star_cluster, first column is group number, second is number of individuals, third individual index
+    cluster_result_name = options.output_suffix + ".descent_clade_result.txt"
+    cluster_result = open(cluster_result_name, "w")
+    for i in set(group):
+        individual_index_array = np.array(individual_index[:])
+        individual_list = individual_index_array[np.where(group == i)]
+        individual_list = [str(int(k)+1) for k in individual_list]      # +1 because the nwk start from 1 not 0
+        if len(individual_list) >= options.star:
+            output_line = str(i) + "\t" + str(len(individual_list)) + "\t" + ";".join(individual_list) + "\n"
+            cluster_result.write(output_line)
+    cluster_result.close()
+
+    # log the time it took
+    logger.info("Successful run")
+    logger.debug("Run completed in %f seconds" % (time.time() - start_time,))
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
